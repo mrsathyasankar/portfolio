@@ -34,32 +34,35 @@ look, but use a server to mirror production.)
 
 Pick **one** of these (don't run both — you'd deploy twice).
 
-### Option A — GitHub Actions (this repo's default)
+### Option A — Cloudflare native Git integration (recommended)
 
-A workflow at [.github/workflows/deploy.yml](.github/workflows/deploy.yml)
-deploys to Cloudflare Pages on every push to `main` (PRs get preview deploys).
-One-time setup — repo → **Settings → Secrets and variables → Actions**:
+Zero secrets, zero YAML, and it's still CI/CD off GitHub: every push to `main`
+auto-deploys, and every PR gets a preview URL.
 
-- `CLOUDFLARE_API_TOKEN` — token with **Cloudflare Pages: Edit** permission
-  (Cloudflare → My Profile → API Tokens → Create Token)
-- `CLOUDFLARE_ACCOUNT_ID` — Cloudflare dashboard → right sidebar → Account ID
+1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git**.
+2. Select `mrsathyasankar/portfolio`. Build settings:
+   - Framework preset: **None** · Build command: *(empty)* · Output directory: **`/`**
+3. Deploy, then **Custom domains → Add `sathyasankar.dev`** (DNS + SSL auto-wire).
 
-Until those secrets exist the workflow stays green and just skips the deploy
-(so the repo never shows a red run). After the first deploy, go to the Pages
-project → **Custom domains → Add `sathyasankar.dev`**.
+### Option B — GitHub Actions (optional)
 
-### Option B — Cloudflare native Git integration (zero-config)
+A ready workflow lives on disk at `.github/workflows/deploy.yml` but is **not
+committed yet** — the GitHub CLI token used to create this repo lacks the
+`workflow` scope, so it's listed in `.gitignore` for now. To enable it:
 
-No secrets, no YAML. Cloudflare dashboard → **Workers & Pages → Create → Pages →
-Connect to Git** → select the repo. Build settings:
-- Framework preset: **None** · Build command: *(empty)* · Output directory: **`/`**
+```bash
+gh auth refresh -h github.com -s workflow   # grant the scope (opens browser)
+# then remove the ".github/" line from .gitignore and:
+git add .github && git commit -m "Add Pages deploy workflow" && git push
+```
 
-Then **Custom domains → Add `sathyasankar.dev`**. If you choose this,
-delete `.github/workflows/deploy.yml`.
+It deploys on push and skips gracefully until you add two repo secrets
+(`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`). Use this **instead of** Option
+A, not alongside it.
 
 ### Option C — Direct upload (one-off)
 Pages → Create → **Upload assets** → drag this folder in. Fine for a quick test;
-A or B are better for ongoing edits.
+A is better for ongoing edits.
 
 ## Status / before you go live
 
