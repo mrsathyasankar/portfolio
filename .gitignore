@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Node (only if you later add a build step)
+node_modules/
+
+# Local env / secrets — never commit
+.env
+.env.*
+.dev.vars
+
+# GitHub Actions workflow held back — gh token here lacks "workflow" scope.
+# To enable: gh auth refresh -h github.com -s workflow, then remove this line and `git add .github`.
+.github/
